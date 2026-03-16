@@ -1,0 +1,29 @@
+# .ai-collab/board.yaml
+# Single source of truth for the current plan and all task statuses.
+# Claude maintains this file. Codex reads it but does not write to it.
+
+meta:
+  last_updated: ""          # YYYY-MM-DD
+  last_action: ""           # brief description of what changed
+  orchestrator: claude
+
+current_plan:
+  id: ""                    # e.g. "plan-001"
+  file: ""                  # e.g. "plans/plan-user-auth-2025-01-01.md"
+  goal: ""                  # one-line summary of what the plan achieves
+  status: ""                # draft | active | done | superseded
+
+tasks: []
+# Each entry follows this schema:
+#
+#   - id: "001"
+#     slug: "short-descriptive-name"
+#     file: "tasks/task-001-short-descriptive-name.md"
+#     status: todo          # todo | in_progress | review | done | blocked
+#     assigned_to: codex    # codex | claude | human
+#     depends_on: []        # list of task IDs that must be done first
+#     updated: ""           # YYYY-MM-DD
+
+suggested_next_for_codex:
+  task_id: ""
+  reason: ""
