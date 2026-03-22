@@ -3,18 +3,85 @@
 # Claude maintains this file. Codex reads it but does not write to it.
 
 meta:
-  last_updated: ""          # YYYY-MM-DD
-  last_action: ""           # brief description of what changed
+  last_updated: "2026-03-22"
+  last_action: "task-025 done — MCP to CLI migration complete; plan-003 all tasks done"
   orchestrator: claude
 
-current_plan:
-  id: ""                    # e.g. "plan-001"
-  file: ""                  # e.g. "plans/plan-user-auth-2025-01-01.md"
-  goal: ""                  # one-line summary of what the plan achieves
-  status: ""                # draft | active | done | superseded
+runtime:
+  codex_session_file: "runtime/codex-session.yaml"
+  mcp_enabled: true
 
-tasks: []
-# Each entry follows this schema:
+current_plan:
+  id: "plan-003"
+  goal: "文档主导开发流程对齐：需求条目、Plan Review 判定、里程碑 Review、一致性检查脚本、PR 流程"
+  status: "done"
+
+prev_plan:
+  id: "plan-002"
+  goal: "Protocol hardening: batch-1 fixes + batch-2 spec rules + batch-3 template simplifications"
+  status: "done"
+
+current_spec:
+  version: "0.3.0"
+  file: "spec/SPEC.md"
+  last_updated: "2026-03-21"
+
+spec_status:
+  spec_dirty: false         # true if spec changed since last replan evaluation
+  replan_required: false    # true if spec changes invalidate current plan
+  invalidated_tasks: []     # list of task IDs affected by spec changes
+  last_spec_change: ""      # YYYY-MM-DD of most recent spec change
+
+tasks:
+  - id: "001"
+    slug: "update-codex-probe"
+    file: "tasks/task-001-update-codex-probe.md"
+    status: done
+    assigned_to: codex
+    depends_on: []
+    updated: "2026-03-18"
+  - id: "002"
+    slug: "create-mini-py"
+    file: "tasks/task-002-create-mini-py.md"
+    status: done
+    assigned_to: codex
+    depends_on: []
+    updated: "2026-03-18"
+  - id: "003"
+    slug: "first-codex-mcp-call"
+    file: "tasks/task-003-first-codex-mcp-call.md"
+    status: done
+    assigned_to: codex
+    depends_on: []
+    updated: "2026-03-18"
+  - id: "004"
+    slug: "resume-codex-mcp-session"
+    file: "tasks/task-004-resume-codex-mcp-session.md"
+    status: done
+    assigned_to: codex
+    depends_on: ["003"]
+    updated: "2026-03-18"
+  - id: "005"
+    slug: "fix-protocol-orphan-fields"
+    file: "tasks/task-005-fix-protocol-orphan-fields.md"
+    status: done
+    assigned_to: codex
+    depends_on: []
+    updated: "2026-03-21"
+  - id: "006"
+    slug: "fix-review-state-rule"
+    file: "tasks/task-006-fix-review-state-rule.md"
+    status: done
+    assigned_to: codex
+    depends_on: []
+    updated: "2026-03-21"
+  - id: "007"
+    slug: "fix-handoff-orchestrator-state"
+    file: "tasks/task-007-fix-handoff-orchestrator-state.md"
+    status: done
+    assigned_to: codex
+    depends_on: []
+    updated: "2026-03-21"
 #
 #   - id: "001"
 #     slug: "short-descriptive-name"
@@ -24,6 +91,129 @@ tasks: []
 #     depends_on: []        # list of task IDs that must be done first
 #     updated: ""           # YYYY-MM-DD
 
+  - id: "008"
+    slug: "define-report-modes"
+    file: "tasks/task-008-define-report-modes.md"
+    status: done
+    assigned_to: codex
+    depends_on: []
+    updated: "2026-03-21"
+  - id: "009"
+    slug: "session-canary-probe"
+    file: "tasks/task-009-session-canary-probe.md"
+    status: done
+    assigned_to: codex
+    depends_on: []
+    updated: "2026-03-21"
+  - id: "010"
+    slug: "fix-runtime-state-files"
+    file: "tasks/task-010-fix-runtime-state-files.md"
+    status: done
+    assigned_to: claude
+    depends_on: []
+    updated: "2026-03-21"
+  - id: "011"
+    slug: "sync-claude-md-canary"
+    file: "tasks/task-011-sync-claude-md-canary.md"
+    status: done
+    assigned_to: codex
+    depends_on: []
+    updated: "2026-03-21"
+  - id: "012"
+    slug: "update-spec-md"
+    file: "tasks/task-012-update-spec-md.md"
+    status: done
+    assigned_to: codex
+    depends_on: []
+    updated: "2026-03-21"
+  - id: "013"
+    slug: "add-spec-conflict-rules"
+    file: "tasks/task-013-add-spec-conflict-rules.md"
+    status: done
+    assigned_to: codex
+    depends_on: []
+    updated: "2026-03-21"
+  - id: "015"
+    slug: "board-yaml-cleanup"
+    file: "tasks/task-015-board-yaml-cleanup.md"
+    status: done
+    assigned_to: claude
+    depends_on: []
+    updated: "2026-03-21"
+  - id: "016"
+    slug: "simplify-templates"
+    file: "tasks/task-016-simplify-templates.md"
+    status: done
+    assigned_to: codex
+    depends_on: []
+    updated: "2026-03-21"
+
+  - id: "017"
+    slug: "handoff-frontmatter"
+    file: "tasks/task-017-handoff-frontmatter.md"
+    status: done
+    assigned_to: codex
+    depends_on: []
+    updated: "2026-03-22"
+  - id: "018"
+    slug: "must-haves-and-quickstart"
+    file: "tasks/task-018-must-haves-and-quickstart.md"
+    status: done
+    assigned_to: codex
+    depends_on: []
+    updated: "2026-03-22"
+
+  - id: "019"
+    slug: "spec-requirements"
+    file: "tasks/task-019-spec-requirements.md"
+    status: done
+    assigned_to: claude
+    depends_on: []
+    updated: "2026-03-22"
+  - id: "020"
+    slug: "plan-review-verdict"
+    file: "tasks/task-020-plan-review-verdict.md"
+    status: done
+    assigned_to: codex
+    depends_on: []
+    updated: "2026-03-22"
+  - id: "021"
+    slug: "milestone-review-template"
+    file: "tasks/task-021-milestone-review-template.md"
+    status: done
+    assigned_to: codex
+    depends_on: ["019"]
+    updated: "2026-03-22"
+  - id: "022"
+    slug: "consistency-check-script"
+    file: "tasks/task-022-consistency-check-script.md"
+    status: done
+    assigned_to: codex
+    depends_on: []
+    updated: "2026-03-22"
+  - id: "023"
+    slug: "pr-workflow-rules"
+    file: "tasks/task-023-pr-workflow-rules.md"
+    status: done
+    assigned_to: codex
+    depends_on: ["019", "020"]
+    updated: "2026-03-22"
+  - id: "024"
+    slug: "quickstart-workflow-overview"
+    file: "tasks/task-024-quickstart-workflow-overview.md"
+    status: done
+    assigned_to: codex
+    depends_on: ["023"]
+    updated: "2026-03-22"
+
+  - id: "025"
+    slug: "migrate-to-codex-cli"
+    file: "tasks/task-025-migrate-to-codex-cli.md"
+    status: done
+    assigned_to: codex
+    depends_on: []
+    updated: "2026-03-22"
+
 suggested_next_for_codex:
   task_id: ""
-  reason: ""
+  reason: "plan-003 all tasks done — pending plan-level review and PR"

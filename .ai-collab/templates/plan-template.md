@@ -90,6 +90,22 @@ These are plan-level; each task has its own criteria.
 
 ---
 
+## Plan review verdict
+
+<!--
+Filled in by Claude after all tasks in this plan are done and the plan-level review is complete.
+Do not fill this in until all tasks are done.
+-->
+
+- [ ] **PASS** - all plan acceptance criteria met. Proceed to commit + PR.
+- [ ] **REWORK** - one or more criteria failed. Specific tasks return to `todo`. See review doc.
+- [ ] **BACK TO PRD** - fundamental requirement mismatch. Update SPEC.md before replanning.
+
+**Verdict date:**
+**Review doc:** `reviews/review-<YYYY-MM-DD>-<N>.md`
+
+---
+
 ## Notes and decisions log
 
 | Date | Decision | Rationale |

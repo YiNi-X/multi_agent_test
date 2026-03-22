@@ -21,6 +21,14 @@
 
 ---
 
+## Invocation mode
+
+`A` or `B` - state the mode and one-line rationale.
+- `A` (MCP direct): <= 2 files, all criteria verifiable from MCP response, no code logic changes
+- `B` (report required): > 2 files, OR shell command verification needed, OR code logic changes
+
+---
+
 ## Objective
 
 > One sentence. What concrete change does this task make?
@@ -31,8 +39,8 @@
 
 <!--
 What does Codex need to know before starting?
-Reference relevant plan requirements (e.g. REQ-01) and any existing code to read first.
-Keep this to 3–5 bullet points.
+Reference relevant plan requirements (for example, REQ-01) and any existing code to
+read first. Keep this to 3-5 bullet points.
 -->
 
 - ...
@@ -47,7 +55,7 @@ Files or directories that Codex is expected to create or modify.
 Codex should not touch files outside this list without checking with the orchestrator.
 -->
 
-```
+```text
 src/...
 tests/...
 ```
@@ -57,57 +65,69 @@ tests/...
 ## Steps
 
 <!--
-Ordered list of concrete implementation steps.
-Each step should be small enough that Codex can verify it independently.
+Optional for simple tasks (1-2 steps). Required for complex tasks.
+If the objective is self-evident, this section may be omitted.
+For tasks that need it, provide an ordered list of concrete implementation steps.
 -->
 
 1. ...
 2. ...
-3. ...
 
 ---
 
 ## Acceptance criteria
 
 <!--
-Objective, testable conditions. The task is done when ALL of these pass.
+Objective, testable conditions. The task is done when all of these pass.
 Use commands or test names where possible.
 -->
 
 - [ ] `<test command or observable outcome>`
 - [ ] `<test command or observable outcome>`
-- [ ] No new linter errors in target paths
 
----
+**Definition of done (always required):**
+- [ ] All criteria above pass
+- [ ] `## Codex execution log` appended to this task file
+- [ ] If invocation mode is `B`: report written to `reports/task-<ID>-<slug>-<YYYY-MM-DD>.md`
+- [ ] No files modified outside `target_paths`
 
-## Definition of done
+## must_haves (optional)
 
-- [ ] All acceptance criteria above pass
-- [ ] Report written to `reports/report-<ID>-<YYYY-MM-DD>.md`
-- [ ] Task status updated to `review` in this file
-- [ ] `board.yaml` status updated to `review` ← Claude will do this after reading the report
+<!--
+Use this section for complex tasks that modify 3+ files or where the same concept
+must be expressed consistently across multiple files.
+
+Write from the goal backward: what must be TRUE for the objective to be achieved?
+Not "what did Codex write" but "what must the system guarantee after this task".
+
+Skip this section for simple tasks (1-2 files) where acceptance_criteria already
+captures the full intent.
+
+Example:
+  - "All three files describe the canary failure path with the same user-confirmation step"
+  - "The spec version in board.yaml, SPEC.md, and codex-handoff.md are identical"
+-->
+
+- (optional - add goal-backward truths here for complex tasks)
+
+### Claude review handoff
+
+1. Claude sets task status to `review` in `board.yaml` before writing the review document.
+2. Claude writes the review document in `reviews/`.
+3. Claude sets task status to `done` in `board.yaml` after accepting the output.
 
 ---
 
 ## Codex execution log
 
-<!-- Codex fills this section in. Claude reads it during review. -->
-
-**Status update:** `todo` → `in_progress` on YYYY-MM-DD
-
-**Approach taken:**
 <!--
-Brief description of what Codex actually did. Note any deviations from the steps above.
--->
+Only Codex writes this section. Do not edit the task definition sections above.
+Claude reads this section during review.
 
-**Blockers encountered:**
-<!--
-If status is `blocked`, describe the blocker here in detail so Claude can replan.
+Mode A: Write a complete summary here (this is the primary record).
+Mode B: Write 3 lines max + a reference to the report file. Full details go in the report.
+  Format:
+    Status: in_progress -> review
+    Report: reports/task-<ID>-<slug>-<YYYY-MM-DD>.md
+    Summary: (one line describing what was done)
 -->
-
-**Verification results:**
-<!--
-Paste test output, lint output, or other evidence that acceptance criteria pass.
--->
-
-**Final status:** `review` | `blocked`

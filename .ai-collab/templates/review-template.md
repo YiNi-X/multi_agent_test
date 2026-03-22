@@ -11,7 +11,9 @@
 |---|---|
 | Review ID | `review-<YYYY-MM-DD>-<N>` |
 | Reviewing | Task `<ID>` / Plan `<NNN>` |
-| Report read | `reports/report-<ID>-<YYYY-MM-DD>.md` |
+| Report read | `reports/task-<ID>-<slug>-<YYYY-MM-DD>.md` or `N/A (Mode A)` |
+| Invocation mode | `A - MCP direct` or `B - report required` |
+| Mode A evidence | *(Mode A only)* Key excerpt from MCP response confirming acceptance criteria, or `N/A` for Mode B |
 | Date | YYYY-MM-DD |
 | Reviewer | claude |
 
@@ -76,3 +78,23 @@ Suggest the next task ID for Codex, or any replanning needed.
 **Board updates made:**
 - Task `<ID>` status → `done` / `todo` / `blocked`
 - `board.yaml > suggested_next_for_codex` updated
+
+---
+
+## Plan-level verdict (fill only when reviewing a completed plan, not individual tasks)
+
+<!--
+When all tasks in a plan are done, Claude writes a plan-level review.
+This section determines what happens next at the plan level.
+-->
+
+| Criterion | Result |
+|---|---|
+| All task acceptance criteria passed | pass / fail |
+| Plan-level acceptance criteria met | pass / fail |
+| No unresolved spec conflicts | pass / fail |
+
+**Verdict:**
+- [ ] PASS -> commit all changes, open PR, update `board.yaml > current_plan.status: done`
+- [ ] REWORK -> list tasks that need rework, return them to `todo`
+- [ ] BACK TO PRD -> describe the mismatch, set `spec_dirty: true`, update SPEC.md before next plan

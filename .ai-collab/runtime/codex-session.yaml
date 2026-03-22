@@ -1,0 +1,27 @@
+# .ai-collab/runtime/codex-session.yaml
+# Runtime state for Codex CLI session continuity
+# Claude maintains this file. Codex does not write to it.
+# Session history is stored locally in ~/.codex/session_index.jsonl
+
+project_id: "test_of_multi_agent"
+
+codex_session:
+  last_session_id: "019d133d-1b84-7773-9926-c26f7c607781"
+  last_task_id: "025"
+  last_used_at: "2026-03-22"
+  total_tasks_executed: 0    # total tasks executed via CLI in this project
+  session_mode: "cli"        # cli | mcp (always cli after migration)
+
+session_policy:
+  resume_for_dependent_tasks: true   # use codex resume for tasks with depends_on
+  new_session_for_independent: true  # use fresh session for independent tasks
+
+notes: |
+  This file tracks Codex CLI session state for project continuity.
+  Claude checks this before instructing user to invoke Codex:
+  - If task has depends_on referencing last_task_id -> instruct user: codex resume <last_session_id>
+  - If task is independent -> instruct user: codex (interactive) or codex exec (non-interactive)
+
+  To find the last session ID after a Codex run:
+    tail -1 ~/.codex/session_index.jsonl
+  The 'id' field is the session ID to record here.

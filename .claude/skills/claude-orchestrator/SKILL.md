@@ -1,20 +1,8 @@
 ---
 name: claude-orchestrator
-description: |
-  Multi-agent collaboration orchestrator for Claude + Codex workflows.
-
-  Trigger this skill when the user wants to:
-  - Coordinate work across Claude and Codex agents
-  - Break down a feature, story, or initiative into atomic tasks for Codex
-  - Review Codex progress, reports, or blocked tasks
-  - Establish or update a shared plan in .ai-collab/
-  - Audit task status on the board and decide what comes next
-
-  Do NOT trigger this skill implicitly. It must be explicitly invoked by the user
-  via /claude-orchestrator. Claude should never self-invoke this skill to take
-  over implementation work without user direction.
-trigger: explicit-only
-arguments: $ARGUMENTS
+description: Orchestrate Claude↔Codex collaboration through .ai-collab/. Use only when the user explicitly wants planning, task splitting, progress review, or replanning for the shared workflow.
+disable-model-invocation: true
+user-invocable: true
 ---
 
 # claude-orchestrator
@@ -37,7 +25,8 @@ Before doing anything else:
      2. `.ai-collab/board.yaml`
      3. Any files in `.ai-collab/plans/` (most recent first)
      4. Any files in `.ai-collab/tasks/` with status `in_progress` or `blocked`
-     5. Any files in `.ai-collab/reviews/` (most recent first)
+     5. Any files in `.ai-collab/reports/` (most recent first)
+     6. Any files in `.ai-collab/reviews/` (most recent first)
 
 2. Summarize what you found: current plan, task counts by status, any blockers.
 
@@ -79,6 +68,7 @@ Create the `.ai-collab/` directory structure:
     plan-template.md
     task-template.md
     review-template.md
+    report-template.md
 ```
 
 Populate `README.md` and `board.yaml` with empty/starter content.
@@ -154,8 +144,177 @@ Then state clearly:
 | Decompose work into atomic, testable units | Modify business logic files |
 | Review Codex output and write review docs | Approve its own reviews |
 | Update board.yaml and task statuses | Make architectural decisions unilaterally |
-| Flag risks and ask clarifying questions | |
+| Flag risks and ask clarifying questions | Create subagents to simulate Codex workers |
+| Invoke Codex via MCP (codex/codex-reply) | |
 
 **Exception:** If the user explicitly says "Claude, go ahead and implement this",
 Claude may make targeted code changes scoped to the specific request. Claude must
 confirm the scope before touching any files outside `target_paths`.
+
+---
+
+## Codex MCP invocation protocol
+
+Before executing any task assigned to Codex:
+
+### 1. Check session state
+
+Read `.ai-collab/runtime/codex-session.yaml` and determine if session is reusable:
+
+```python
+# Session is reusable if ALL conditions are true:
+- codex_session.active == true
+- codex_session.thread_id is not empty
+- Session not expired (see expiry rules below)
+```
+
+**Session expiry rules (local scheduling policy):**
+- `last_used_at` is more than `max_idle_minutes` ago (default: 30 minutes)
+- `spec_version_at_start` differs from current spec version in `board.yaml`
+- User explicitly requests a fresh start (e.g., "start a new Codex session")
+
+**Note:** The 30-minute idle threshold is a local workflow policy for session continuity,
+not a platform-level guarantee from the Codex MCP server.
+
+### 2. Choose invocation method
+
+**If session is reusable:**
+```
+Use: mcp__codex__codex-reply
+Parameters:
+  threadId: <codex_session.thread_id>
+  prompt: <task prompt with context>
+```
+
+**If session is NOT reusable:**
+```
+Use: mcp__codex__codex
+Parameters:
+  prompt: <task prompt with full context>
+  cwd: <project root>
+```
+
+### 3. Prepare the prompt
+
+Include references to:
+- `AGENTS.md` — Codex role and protocol
+- `.ai-collab/README.md` — workflow overview
+- `.ai-collab/board.yaml` — current plan and task statuses
+- `.ai-collab/spec/SPEC.md` — if exists
+- `.ai-collab/runtime/codex-handoff.md` — context from previous session (if resuming)
+- The specific task file path (e.g., `.ai-collab/tasks/task-003-foo.md`)
+
+**Prompt template for new session:**
+```
+You are Codex, the implementation agent in a Claude↔Codex collaboration.
+
+Context files:
+- AGENTS.md
+- .ai-collab/README.md
+- .ai-collab/board.yaml
+- .ai-collab/spec/SPEC.md
+
+Your task: .ai-collab/tasks/task-<id>-<slug>.md
+
+Please read the task file and execute according to its acceptance_criteria.
+```
+
+**Prompt template for session continuation:**
+```
+Continuing from previous session.
+
+Previous context: .ai-collab/runtime/codex-handoff.md
+
+Next task: .ai-collab/tasks/task-<id>-<slug>.md
+
+Please read the task file and execute.
+```
+
+### 4. After Codex completes
+
+**Extract response data:**
+- `threadId` from the MCP response (field name must match actual MCP return value)
+- Task completion status (success/failure)
+- Any blockers or issues reported
+
+**Update `codex-session.yaml`:**
+```yaml
+codex_session:
+  active: true
+  thread_id: "<threadId from MCP response>"
+  started_at: "<ISO 8601>" (only if new session)
+  last_used_at: "<ISO 8601>"
+  last_task_id: "<task-id>"
+  status: "completed" | "failed"
+  total_tasks_executed: <increment by 1>
+  spec_version_at_start: "<current_spec.version from board.yaml>" (only if new session)
+  spec_hash_at_start: "<optional: hash of spec content>" (only if new session)
+  handoff_version: <increment by 1>
+
+session_history:
+  recent_tasks: [<append task-id, keep last 10>]
+
+handoff_summary:
+  last_updated: "<ISO 8601>"
+```
+
+**Spec version tracking:**
+When starting a new session, capture `current_spec.version` from `board.yaml`.
+On subsequent invocations, compare current spec version with `spec_version_at_start`.
+If they differ and `force_new_on_spec_change == true`, treat session as expired.
+
+**Update `codex-handoff.md`:**
+
+Write a concise summary (not full conversation history):
+
+```markdown
+# Codex Handoff Summary
+
+**Last updated:** <ISO 8601>
+
+---
+
+## Current Session State
+
+- **Thread ID:** <thread_id>
+- **Status:** <completed|failed>
+- **Tasks Executed:** <count>
+- **Last Task:** task-<id>-<slug>
+- **Spec Version:** <spec_version_at_start>
+- **Handoff Version:** <handoff_version>
+
+---
+
+## Context for Next Invocation
+
+When resuming this session, Codex should be aware of:
+
+- <Key decisions or state from last task>
+- <Files modified in last task>
+- <Any setup or configuration done>
+
+---
+
+## Recent Completions
+
+- task-<id>: <one-line summary> ✓
+- task-<id>: <one-line summary> ✓
+
+---
+
+## Open Issues / Blockers
+
+<List any blockers or issues that need resolution>
+
+---
+
+## Notes
+
+<Any other context needed for smooth resumption>
+```
+
+### 5. Subagent restrictions
+
+- Claude may use subagents (Agent tool) for spec review, discovery, and research
+- Claude must NOT create subagents to execute implementation tasks
+- All code modification and validation must go through Codex MCP
