@@ -21,7 +21,7 @@ current_milestone:
   goal: "建立 Claude+Codex CLI 协同协议，实现文档主导的开发流程"
   plans: ["plan-001", "plan-002", "plan-003"]
   status: "done"
-  review_file: ""   # spec/milestones/milestone-001-<slug>-<date>.md when written
+  review_file: "spec/milestones/milestone-001-protocol-bootstrap-2026-03-22.md"
 
 prev_plan:
   id: "plan-002"
