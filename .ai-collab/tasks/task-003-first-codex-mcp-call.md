@@ -38,3 +38,6 @@ codex
 
 ## Updated
 2026-03-18
+
+## Codex execution log
+- 2026-03-18: Appended `[task-003] first-mcp-call verified` to `CODEX_CANARY.md` via Codex CLI (pre-protocol-formalization era). Acceptance criteria met: canary line present, no other files modified.

@@ -45,3 +45,6 @@ codex
 
 ## Updated
 2026-03-18
+
+## Codex execution log
+- 2026-03-18: Appended `[task-004] session-resume verified` to `CODEX_CANARY.md` by resuming previous Codex CLI session (pre-protocol-formalization era). Acceptance criteria met: canary line present, no other files modified.

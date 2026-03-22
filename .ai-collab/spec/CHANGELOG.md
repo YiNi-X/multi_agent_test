@@ -6,6 +6,32 @@ This document tracks changes to the Living Specification. Each entry records wha
 
 ---
 
+## v0.4.0 - 2026-03-22
+
+**Changes:**
+- Migrated Codex invocation from MCP Server to local CLI (`codex`, `codex exec`, `codex resume`) (task-025)
+- Removed canary probe mechanism — local CLI sessions do not expire (task-025)
+- Replaced `thread_id` / `threadId` session tracking with `last_session_id` from `~/.codex/session_index.jsonl` (task-025)
+- Added numbered requirements REQ-01~10 to SPEC.md for plan-level traceability (task-019)
+- Added plan-level verdict (PASS/REWORK/BACK TO PRD) to plan and review templates (task-020)
+- Added milestone review template with requirements coverage tracking (task-021)
+- Added `tools/check_consistency.py` for automated cross-file consistency validation (task-022)
+- Added PR workflow rules to CLAUDE.md: 6-step delivery sequence per plan (task-023)
+- Added 7-stage document-driven workflow overview to QUICKSTART.md (task-024)
+- Updated session continuity section to reflect CLI model (README, SPEC, SKILL, codex-worker-protocol)
+
+**Rationale:** MCP Server sessions expired on the platform side (no local persistence), causing canary failures and requiring complex session management. Codex CLI stores sessions locally in `~/.codex/` and never expires them, making the entire canary/threadId mechanism unnecessary.
+
+**Impact:**
+- No tasks invalidated — all existing task files remain valid
+- `codex-session.yaml` schema updated: `thread_id` → `last_session_id`, removed MCP-only fields
+- `codex-handoff.md` front-matter updated: `thread_id` → `last_session_id`
+- `check_consistency.py` Check 1 updated to verify `last_session_id` instead of `thread_id`
+
+**Related decisions:** D014 (CLI over MCP for session persistence)
+
+---
+
 ## v0.3.0 - 2026-03-21
 
 **Changes:**

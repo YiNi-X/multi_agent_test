@@ -1,8 +1,8 @@
 # Living Specification: Claude + Codex Multi-Agent Collaboration System
 
-**Last updated:** 2026-03-21
+**Last updated:** 2026-03-22
 **Status:** Active
-**Version:** 0.3.0
+**Version:** 0.4.0
 
 ---
 

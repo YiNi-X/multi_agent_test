@@ -16,15 +16,22 @@ current_plan:
   goal: "文档主导开发流程对齐：需求条目、Plan Review 判定、里程碑 Review、一致性检查脚本、PR 流程"
   status: "done"
 
+current_milestone:
+  id: "milestone-001"
+  goal: "建立 Claude+Codex CLI 协同协议，实现文档主导的开发流程"
+  plans: ["plan-001", "plan-002", "plan-003"]
+  status: "done"
+  review_file: ""   # spec/milestones/milestone-001-<slug>-<date>.md when written
+
 prev_plan:
   id: "plan-002"
   goal: "Protocol hardening: batch-1 fixes + batch-2 spec rules + batch-3 template simplifications"
   status: "done"
 
 current_spec:
-  version: "0.3.0"
+  version: "0.4.0"
   file: "spec/SPEC.md"
-  last_updated: "2026-03-21"
+  last_updated: "2026-03-22"
 
 spec_status:
   spec_dirty: false         # true if spec changed since last replan evaluation
