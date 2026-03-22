@@ -69,6 +69,23 @@ Stage 7: Submit PR             -> Commit + PR; milestone completion also gets a 
 
 ---
 
+## 5. Initialize protocol in a new project
+
+To use this collaboration protocol in a different project:
+
+```bash
+bash /path/to/this/repo/tools/init.sh /path/to/new/project
+```
+
+This copies the protocol files (CLAUDE.md, AGENTS.md, templates, agents, skills, check_consistency.py) into the new project and creates a blank board.yaml and SPEC.md with today's date. No project-specific history is copied.
+
+After initialization:
+1. `cd /path/to/new/project`
+2. Open `QUICKSTART.md` and follow from Stage 1
+3. Tell Claude your project goal - it reads `board.yaml` and starts planning
+
+---
+
 ## Workflow order
 
 ```

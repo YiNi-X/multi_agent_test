@@ -2,10 +2,10 @@
 # machine-readable snapshot - Claude-maintained, updated after every task review
 handoff_version: 4
 snapshot_at: "2026-03-22"
-last_session_id: "019d133d-1b84-7773-9926-c26f7c607781"   # last ~/.codex/session_index.jsonl id
-last_task_id: "025"                           # must match codex-session.yaml
-plan_id: "plan-003"
-plan_status: "done"
+last_session_id: "019d15f2-d7ef-7130-8efb-a8bc9e63b25a"   # last ~/.codex/session_index.jsonl id
+last_task_id: "030"                           # must match codex-session.yaml
+plan_id: "plan-004"
+plan_status: "in_progress"
 spec_version: "0.3.0"
 spec_dirty: false
 suggested_next_task_id: ""                           # "" = no pending tasks

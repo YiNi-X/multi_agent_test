@@ -40,3 +40,26 @@ When invoked via CLI (`codex` or `codex exec`):
 - **Report back:** For Mode B tasks, write a report to `.ai-collab/reports/task-<ID>-<slug>-<YYYY-MM-DD>.md`. For Mode A tasks, write a complete summary in the execution log.
 - **Do not update board.yaml:** Claude will update task statuses after reviewing your execution log.
 - **Do not write `runtime/codex-session.yaml`:** Claude maintains this file.
+
+## Task selection
+
+When Claude instructs you to execute a task, the task reference may come in these forms:
+- `next` - pick the first `todo` task assigned to `codex` in `board.yaml` (check `suggested_next_for_codex` first)
+- `task-003` or `003` or `TASK-003` - normalize to the repo's lowercase filename convention
+- A file path like `.ai-collab/tasks/task-003-foo.md` - use that file directly
+
+Always verify the selected task against `board.yaml`: confirm `status: todo`, `assigned_to: codex`, and all `depends_on` tasks are `done`.
+
+## Closing summary
+
+End every task execution with a short review-ready summary:
+
+```text
+Task: task-<ID>-<slug>
+Result: done | review | blocked
+Files changed: <list>
+Validation: <command run or N/A>
+Notes for Claude: <residual risk, blocker, or "none">
+```
+
+This summary is the first thing Claude reads when reviewing your work.

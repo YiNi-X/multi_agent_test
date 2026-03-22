@@ -36,34 +36,55 @@ Claude is the brain of this system. These rules define how Claude should operate
 
 ### Codex CLI execution model
 
-Codex executes tasks via the local CLI: `codex` (interactive) or `codex exec` (non-interactive).
+Codex executes tasks via `codex exec --full-auto` invoked directly by Claude through the Bash tool. No user interaction is required for task execution.
 
-**For implementation, code modification, and validation:** always instruct the user to run Codex CLI — never use bash directly, never use subagents for implementation.
+**For implementation, code modification, and validation:** use `codex exec --full-auto` via Bash - never use subagents for implementation.
 
 **Workflow per task:**
 1. Claude writes the task file to `.ai-collab/tasks/task-<ID>-<slug>.md`
-2. Claude tells the user: "Run: `codex` and paste this prompt:" followed by the task prompt
-   — OR — "Run: `codex exec '<one-line task description>'`"
-3. Codex reads the task file, executes, writes `## Codex execution log` in the task file
-4. User tells Claude when Codex is done
-5. Claude reads the execution log, reviews, updates `board.yaml`
+2. Claude runs Codex directly:
+   ```bash
+   cd <project-root> && codex exec --full-auto "Execute task <ID> in .ai-collab/tasks/task-<ID>-<slug>.md. Read AGENTS.md and .ai-collab/board.yaml first. Do not modify board.yaml or runtime/codex-session.yaml."
+   ```
+3. Claude reads the execution log written by Codex to the task file
+4. Claude reviews, updates `board.yaml`
 
 **Session tracking:**
-- After each Codex run, record the session ID from `~/.codex/session_index.jsonl` (last entry `id` field)
+- After each `codex exec` run, get the session ID from the output header line `session id: <id>`
 - Store in `runtime/codex-session.yaml` under `last_session_id`
-- To resume a previous session: user runs `codex resume <session-id>` or `codex resume --last`
-- Local sessions do not expire
+- To resume a previous session for dependent tasks:
+  ```bash
+  cd <project-root> && codex exec --full-auto resume --last "Execute task <ID> in .ai-collab/tasks/task-<ID>-<slug>.md. Read AGENTS.md and .ai-collab/board.yaml first."
+  ```
+- Local sessions do not expire - `~/.codex/sessions/` persists indefinitely
 
 **Full protocol details:** `.ai-collab/templates/codex-worker-protocol.md`
 
 ### Task decomposition rules
 
 Every task handed to Codex must be:
-- **Small** — fewer than ~5 files, completable in one focused session
-- **Specific** — named after the concrete change, not the feature
-- **Verifiable** — has objective `acceptance_criteria` (commands or observable outcomes)
-- **Scoped** — has `target_paths` listing which files Codex may touch
-- **Ordered** — has `depends_on` if it requires another task to finish first
+- **Small** - fewer than ~5 files, completable in one focused session
+- **Specific** - named after the concrete change, not the feature
+- **Verifiable** - has objective `acceptance_criteria` (commands or observable outcomes)
+- **Scoped** - has `target_paths` listing which files Codex may touch
+- **Ordered** - has `depends_on` if it requires another task to finish first
+
+### Spec-gardener integration
+
+The `spec-gardener` subagent is the gatekeeper for `.ai-collab/spec/` quality. Claude must invoke it in these situations:
+
+1. **Before modifying SPEC.md:** Run spec-gardener to check for existing drift or contradictions before adding new content. Prevents compounding existing issues.
+2. **Before task decomposition (split phase):** Run spec-gardener to verify the spec is clear and consistent enough to decompose into tasks. If spec-gardener raises issues, resolve them first.
+3. **After a spec version bump:** Run spec-gardener to confirm the new version is internally consistent and all open questions are correctly reflected.
+4. **When user asks to check spec consistency:** Always use spec-gardener rather than reading spec files manually.
+
+**How to invoke:**
+Use the Agent tool with `subagent_type: spec-gardener`. Provide the specific question or context.
+
+**When NOT required:**
+- Minor clarification edits (typos, rephrasing without semantic change)
+- Adding a single requirement entry that does not interact with existing constraints
+- Routine CHANGELOG.md entries
 
 ### Spec change rules
 

@@ -4,14 +4,19 @@
 
 meta:
   last_updated: "2026-03-22"
-  last_action: "task-025 done — MCP to CLI migration complete; plan-003 all tasks done"
+  last_action: "task-030 done — auto codex exec verified; plan-004 all tasks done"
   orchestrator: claude
 
 runtime:
   codex_session_file: "runtime/codex-session.yaml"
-  mcp_enabled: true
+  mcp_enabled: false
 
 current_plan:
+  id: "plan-004"
+  goal: "协议完善：spec-gardener 系统化、codex-worker 合并、init.sh 打包脚本"
+  status: "in_progress"
+
+prev_plan:
   id: "plan-003"
   goal: "文档主导开发流程对齐：需求条目、Plan Review 判定、里程碑 Review、一致性检查脚本、PR 流程"
   status: "done"
@@ -221,6 +226,43 @@ tasks:
     depends_on: []
     updated: "2026-03-22"
 
+  - id: "026"
+    slug: "spec-gardener-integration"
+    file: "tasks/task-026-spec-gardener-integration.md"
+    status: done
+    assigned_to: codex
+    depends_on: []
+    updated: "2026-03-22"
+  - id: "027"
+    slug: "merge-codex-worker-skill"
+    file: "tasks/task-027-merge-codex-worker-skill.md"
+    status: done
+    assigned_to: codex
+    depends_on: []
+    updated: "2026-03-22"
+  - id: "028"
+    slug: "init-script"
+    file: "tasks/task-028-init-script.md"
+    status: done
+    assigned_to: codex
+    depends_on: ["027"]
+    updated: "2026-03-22"
+  - id: "029"
+    slug: "update-quickstart-init"
+    file: "tasks/task-029-update-quickstart-init.md"
+    status: done
+    assigned_to: codex
+    depends_on: ["028"]
+    updated: "2026-03-22"
+
+  - id: "030"
+    slug: "auto-codex-exec"
+    file: "tasks/task-030-auto-codex-exec.md"
+    status: done
+    assigned_to: codex
+    depends_on: []
+    updated: "2026-03-22"
+
 suggested_next_for_codex:
   task_id: ""
-  reason: "plan-003 all tasks done — pending plan-level review and PR"
+  reason: "plan-004 all tasks done — pending plan-level review and PR"

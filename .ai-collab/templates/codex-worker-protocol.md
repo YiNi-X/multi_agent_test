@@ -1,66 +1,51 @@
 # Codex Worker Protocol
 
-This document defines how Claude instructs the user to invoke Codex CLI and how session continuity works.
+This document defines how Claude invokes Codex CLI automatically and how session continuity works.
 
 ---
 
 ## Invocation methods
 
-### Method 1: Start new session (interactive)
+### Method 1: New session (automatic)
 
-Claude tells the user to run:
-```
-codex
-```
-Then paste the task prompt when Codex starts.
-
-Use when:
-- Starting a new task with no prior session context needed
-- Task is independent (no `depends_on`)
-
-### Method 2: Start new session (non-interactive)
-
-Claude tells the user to run:
-```
-codex exec "Execute task <ID> in .ai-collab/tasks/task-<ID>-<slug>.md. Read AGENTS.md and .ai-collab/board.yaml first."
+Claude runs via Bash tool:
+```bash
+cd <project-root> && codex exec --full-auto "Execute task <ID> in .ai-collab/tasks/task-<ID>-<slug>.md. Read AGENTS.md and .ai-collab/board.yaml first. Do not modify board.yaml or runtime/codex-session.yaml."
 ```
 
 Use when:
-- Task is self-contained and instructions are clear in the task file
-- Faster than interactive mode for simple tasks
+- Task is independent (no `depends_on` referencing last task)
+- Starting a new plan or a new batch of work
 
-### Method 3: Resume previous session
+### Method 2: Resume previous session (automatic)
 
-Claude tells the user to run:
-```
-codex resume <session-id>
-```
-or:
-```
-codex resume --last
+Claude runs via Bash tool:
+```bash
+cd <project-root> && codex exec --full-auto resume --last "Execute task <ID> in .ai-collab/tasks/task-<ID>-<slug>.md. Read AGENTS.md and .ai-collab/board.yaml first."
 ```
 
 Use when:
 - Task has `depends_on` referencing the last executed task
 - Continuing work that benefits from prior session context
 
+### Method 3: Manual fallback
+
+If `codex exec` is unavailable or fails, tell the user to run:
+```bash
+codex "Execute task <ID> in .ai-collab/tasks/task-<ID>-<slug>.md. Read AGENTS.md and .ai-collab/board.yaml first."
+```
+
 ---
 
 ## Session tracking
 
-After each Codex run:
-1. User reports the session ID (or Claude reads `~/.codex/session_index.jsonl` last entry)
+After each `codex exec` run:
+1. Claude gets the session ID from the output header line `session id: <id>`
 2. Claude updates `runtime/codex-session.yaml`:
-   - `last_session_id`: the session ID from `session_index.jsonl`
+   - `last_session_id`: the session ID from the `codex exec` output
    - `last_task_id`: the task ID just executed
    - `last_used_at`: current date
    - `total_tasks_executed`: increment by 1
-
-To find the session ID after a run:
-```bash
-tail -1 ~/.codex/session_index.jsonl
-```
-The `id` field is the session ID.
 
 ---
 
@@ -68,10 +53,10 @@ The `id` field is the session ID.
 
 ```text
 [New task] -> Does task have depends_on referencing last task?
-              -> YES: Resume session (codex resume <last_session_id>)
-              -> NO:  New session (codex or codex exec)
+              -> YES: Resume session (codex exec --full-auto resume --last)
+              -> NO:  New session (codex exec --full-auto)
               -> After execution:
-                 Read ~/.codex/session_index.jsonl last entry
+                 Read the session id from codex exec output
                  Update runtime/codex-session.yaml
                  Claude reviews execution log
                  Claude updates board.yaml
@@ -106,7 +91,7 @@ Execute task `<task-id>` defined in `.ai-collab/tasks/task-<id>-<slug>.md`
 
 ## Local session continuity
 
-Local Codex CLI sessions are stored in `~/.codex/sessions/` and do not expire. Session continuity is managed by `codex resume <session-id>`.
+Local Codex CLI sessions are stored in `~/.codex/sessions/` and do not expire. Session continuity is managed by `codex exec --full-auto resume --last` when Claude wants to reuse the previous execution context.
 
 ---
 
