@@ -84,16 +84,17 @@ Enable structured, traceable collaboration between Claude (orchestrator) and Cod
 ### 6. Session continuity
 
 - Claude checks `runtime/codex-session.yaml` before each Codex invocation
-- Sends canary probe (`CANARY_OK:<last_task_id>`) before every `codex-reply()` call
-- On canary failure: notifies user, waits for confirmation, then starts new session with `codex()`
-- Time-based expiry (`max_idle_minutes`) is a fallback heuristic only; canary probe is the primary check
+- For dependent tasks: instructs user to run `codex resume <last_session_id>`
+- For independent tasks: instructs user to run `codex` or `codex exec`
+- Session history stored locally in `~/.codex/session_index.jsonl` — does not expire
+- After each run: Claude updates `last_session_id` and `last_task_id` in `codex-session.yaml`
 
 ### 7. Invocation modes
 
 - Every task declares invocation mode in the task file
-- **Mode A (MCP direct):** <= 2 files, all criteria verifiable from MCP response, no code logic changes. Codex does not write a report file.
+- **Mode A (CLI direct):** <= 2 files, all criteria verifiable from execution log, no code logic changes. Codex does not write a report file.
 - **Mode B (report required):** > 2 files, OR shell command verification needed, OR code logic changes. Codex writes a report to `reports/` before handing off to Claude.
-- Mode must be declared in both the task file (`## Invocation mode`) and the Claude invocation prompt.
+- Mode must be declared in both the task file (`## Invocation mode`) and the user-facing Codex prompt.
 
 ### 8. Context handoff
 
@@ -157,7 +158,7 @@ Numbered requirements that plans and tasks can reference by ID. These express wh
 
 ### Quality requirements
 
-- **REQ-09:** Cross-file consistency (thread_id, spec version, task status) must be verifiable by an automated script.
+- **REQ-09:** Cross-file consistency (session_id, spec version, task status) must be verifiable by an automated script.
 - **REQ-10:** Every milestone completion must produce a milestone-level review document summarising all delivered capabilities.
 
 ---

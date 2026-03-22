@@ -145,7 +145,7 @@ Then state clearly:
 | Review Codex output and write review docs | Approve its own reviews |
 | Update board.yaml and task statuses | Make architectural decisions unilaterally |
 | Flag risks and ask clarifying questions | Create subagents to simulate Codex workers |
-| Invoke Codex via MCP (codex/codex-reply) | |
+| Invoke Codex via CLI (instruct user to run codex) | |
 
 **Exception:** If the user explicitly says "Claude, go ahead and implement this",
 Claude may make targeted code changes scoped to the specific request. Claude must
@@ -153,130 +153,91 @@ confirm the scope before touching any files outside `target_paths`.
 
 ---
 
-## Codex MCP invocation protocol
+## Codex CLI invocation protocol
 
-Before executing any task assigned to Codex:
+Before instructing the user to run Codex:
 
 ### 1. Check session state
 
-Read `.ai-collab/runtime/codex-session.yaml` and determine if session is reusable:
+Read `.ai-collab/runtime/codex-session.yaml`:
 
-```python
-# Session is reusable if ALL conditions are true:
-- codex_session.active == true
-- codex_session.thread_id is not empty
-- Session not expired (see expiry rules below)
 ```
-
-**Session expiry rules (local scheduling policy):**
-- `last_used_at` is more than `max_idle_minutes` ago (default: 30 minutes)
-- `spec_version_at_start` differs from current spec version in `board.yaml`
-- User explicitly requests a fresh start (e.g., "start a new Codex session")
-
-**Note:** The 30-minute idle threshold is a local workflow policy for session continuity,
-not a platform-level guarantee from the Codex MCP server.
+# Use codex resume if task has depends_on referencing last_task_id
+# AND last_session_id is not empty
+# Otherwise: new session
+```
 
 ### 2. Choose invocation method
 
-**If session is reusable:**
+**If resuming previous session:**
 ```
-Use: mcp__codex__codex-reply
-Parameters:
-  threadId: <codex_session.thread_id>
-  prompt: <task prompt with context>
+Tell user: codex resume <last_session_id>
 ```
 
-**If session is NOT reusable:**
+**If new session (interactive):**
 ```
-Use: mcp__codex__codex
-Parameters:
-  prompt: <task prompt with full context>
-  cwd: <project root>
+Tell user: codex
+Then provide the task prompt
+```
+
+**If new session (non-interactive):**
+```
+Tell user: codex exec "Execute task <ID> in .ai-collab/tasks/task-<ID>-<slug>.md. Read AGENTS.md and .ai-collab/board.yaml first."
 ```
 
 ### 3. Prepare the prompt
 
 Include references to:
-- `AGENTS.md` — Codex role and protocol
-- `.ai-collab/README.md` — workflow overview
-- `.ai-collab/board.yaml` — current plan and task statuses
-- `.ai-collab/spec/SPEC.md` — if exists
-- `.ai-collab/runtime/codex-handoff.md` — context from previous session (if resuming)
-- The specific task file path (e.g., `.ai-collab/tasks/task-003-foo.md`)
+- `AGENTS.md` - Codex role and protocol
+- `.ai-collab/README.md` - workflow overview
+- `.ai-collab/board.yaml` - current plan and task statuses
+- `.ai-collab/spec/SPEC.md` - if exists
+- The specific task file path
 
-**Prompt template for new session:**
+**Standard prompt template:**
 ```
-You are Codex, the implementation agent in a Claude↔Codex collaboration.
+You are Codex, the implementation agent in a Claude+Codex collaboration.
 
-Context files:
+Context files to read first:
 - AGENTS.md
 - .ai-collab/README.md
 - .ai-collab/board.yaml
-- .ai-collab/spec/SPEC.md
 
 Your task: .ai-collab/tasks/task-<id>-<slug>.md
 
-Please read the task file and execute according to its acceptance_criteria.
-```
-
-**Prompt template for session continuation:**
-```
-Continuing from previous session.
-
-Previous context: .ai-collab/runtime/codex-handoff.md
-
-Next task: .ai-collab/tasks/task-<id>-<slug>.md
-
-Please read the task file and execute.
+Read the task file completely and execute according to its acceptance_criteria.
+For Mode B tasks, write a report to reports/ when done.
+Do not modify board.yaml or runtime/codex-session.yaml.
 ```
 
 ### 4. After Codex completes
 
-**Extract response data:**
-- `threadId` from the MCP response (field name must match actual MCP return value)
-- Task completion status (success/failure)
-- Any blockers or issues reported
+User reports completion. Claude then:
 
 **Update `codex-session.yaml`:**
 ```yaml
 codex_session:
-  active: true
-  thread_id: "<threadId from MCP response>"
-  started_at: "<ISO 8601>" (only if new session)
-  last_used_at: "<ISO 8601>"
+  last_session_id: "<from tail -1 ~/.codex/session_index.jsonl>"
   last_task_id: "<task-id>"
-  status: "completed" | "failed"
+  last_used_at: "<YYYY-MM-DD>"
   total_tasks_executed: <increment by 1>
-  spec_version_at_start: "<current_spec.version from board.yaml>" (only if new session)
-  spec_hash_at_start: "<optional: hash of spec content>" (only if new session)
-  handoff_version: <increment by 1>
-
-session_history:
-  recent_tasks: [<append task-id, keep last 10>]
-
-handoff_summary:
-  last_updated: "<ISO 8601>"
+  session_mode: "cli"
 ```
-
-**Spec version tracking:**
-When starting a new session, capture `current_spec.version` from `board.yaml`.
-On subsequent invocations, compare current spec version with `spec_version_at_start`.
-If they differ and `force_new_on_spec_change == true`, treat session as expired.
 
 **Update `codex-handoff.md`:**
 
-Write a concise summary (not full conversation history):
-
-```markdown
-# Codex Handoff Summary
-
-**Last updated:** <ISO 8601>
+Update both the YAML front-matter and the Markdown body:
+- `last_session_id`: from session_index.jsonl
+- `last_task_id`: task just completed
+- `plan_id` / `plan_status`: current plan state
+- Codex execution state table: last session ID, last task, files modified
+- Orchestrator state table: current plan, spec version, last review, next action
 
 ---
 
 ## Current Session State
 
-- **Thread ID:** <thread_id>
+- **Last Session ID:** <last_session_id>
 - **Status:** <completed|failed>
 - **Tasks Executed:** <count>
 - **Last Task:** task-<id>-<slug>

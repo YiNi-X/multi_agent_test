@@ -134,30 +134,28 @@ When `SPEC.md` changes:
 
 ---
 
-## Codex MCP execution model
+## Codex CLI execution model
 
 ### How Codex is invoked
 
-Claude does not manually hand off tasks to Codex. Instead, Claude invokes Codex programmatically via MCP tools:
+Claude writes task files and instructs the user to run Codex CLI. Claude does not call Codex directly.
 
-- **`mcp__codex__codex(prompt)`** — Start a new Codex session
-- **`mcp__codex__codex-reply(threadId, prompt)`** — Continue an existing session
+- **`codex`** — Start a new interactive session
+- **`codex exec "<prompt>"`** — Run non-interactively
+- **`codex resume <session-id>`** — Resume a previous session (for dependent tasks)
 
 ### Session continuity
 
-To avoid losing context between tasks, Claude maintains session state in `runtime/codex-session.yaml`:
+To reuse context between related tasks, Claude maintains session state in `runtime/codex-session.yaml`:
 
-- **First task:** Claude calls `codex()` and stores the returned `threadId`
-- **Subsequent tasks:** Claude calls `codex-reply(threadId, ...)` to continue the conversation
-- **Session expires when:**
-  - Idle for more than `max_idle_minutes` (default: 30)
-  - Spec changes and `force_new_on_spec_change == true`
-  - User explicitly requests a fresh start
+- **Independent task:** Claude instructs user to run `codex` or `codex exec`
+- **Dependent task:** Claude instructs user to run `codex resume <last_session_id>`
+- **Session history:** stored locally in `~/.codex/session_index.jsonl` — does not expire
 
-**Note:** Time-based expiry is a fallback heuristic only. The primary session
-validity check is the canary probe sent at the start of every
-`codex-reply()` call. If the canary fails, Claude notifies the user and waits
-for confirmation before starting a new session.
+After each Codex run, record the session ID:
+```bash
+tail -1 ~/.codex/session_index.jsonl
+```
 
 ### Why Claude subagents cannot replace Codex
 
@@ -176,10 +174,10 @@ But Claude must NOT create subagents to:
 
 ### Codex invocation checklist
 
-Before invoking Codex, Claude must:
+Before instructing the user to run Codex, Claude must:
 
-1. Read `runtime/codex-session.yaml` to check for active session
-2. Decide: `codex()` (new) or `codex-reply()` (continue)
+1. Read `runtime/codex-session.yaml` to check `last_session_id` and `last_task_id`
+2. Decide: new session or `codex resume <last_session_id>` (if task has `depends_on`)
 3. Prepare prompt with references to:
    - `AGENTS.md`
    - `.ai-collab/README.md`

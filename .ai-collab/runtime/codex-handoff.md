@@ -22,11 +22,11 @@ open_questions_count: 0                              # 0 = all resolved or defer
 
 | Field | Value |
 |---|---|
-| Active session thread_id | `019d1335-848f-7ab1-ad48-ad6af62bfdb8` |
-| Session status | `completed` |
-| Last task executed | `verify-mcp` (connectivity verification) |
-| Tasks executed this session | verify-mcp |
-| Files modified this session | `CODEX_CANARY.md` (canary line appended) |
+| Last session ID | `019d133d-1b84-7773-9926-c26f7c607781` |
+| Session mode | `CLI` |
+| Last task executed | `task-025` (migrate-to-codex-cli) |
+| Tasks executed this session | 019 (Claude direct), 020, 021, 022, 023, 024, 025 |
+| Files modified this session | CLAUDE.md, AGENTS.md, codex-worker-protocol.md, QUICKSTART.md, tools/check_consistency.py, runtime/codex-session.yaml, SPEC.md, templates/plan-template.md, templates/review-template.md, templates/milestone-template.md |
 
 ---
 
@@ -34,14 +34,14 @@ open_questions_count: 0                              # 0 = all resolved or defer
 
 | Field | Value |
 |---|---|
-| Current plan | `plan-002` (`done`) |
+| Current plan | `plan-003` (`done`) |
 | Current spec version | `0.3.0` |
-| Spec last updated | `2026-03-21` |
+| Spec last updated | `2026-03-22` |
 | Spec dirty | `false` |
-| Last review | `review-2026-03-21-3` (task-009 accepted) |
-| Pending decisions | None — all open questions resolved or deferred |
-| Next action | Awaiting user input — plan-002 complete, no pending tasks |
-| Suggested next task | `""` (none) |
+| Last review | `review-2026-03-22-1` (plan-003 plan-level review, PASS) |
+| Pending decisions | None |
+| Next action | plan-004: P0 cleanup (legacy MCP refs), P1 workflow improvements |
+| Suggested next task | `""` (none — awaiting plan-004 definition) |
 
 ### Open questions
 
@@ -52,7 +52,9 @@ All four open questions from prior sessions are resolved or explicitly deferred:
 3. SPEC.md conflict resolution — **Resolved:** block Codex until conflict cleared
 4. SPEC.md granularity — **Deferred:** system-wide patterns only
 
-### Session history note
+### Session history
 
-Prior session `019d0ead-cadd-7341-86d0-877d215983ef` executed tasks 005–016 (via Codex CLI, not MCP).
-Current session `019d1335-848f-7ab1-ad48-ad6af62bfdb8` was created 2026-03-22 as the first verified MCP session.
+All sessions use local Codex CLI (`~/.codex/sessions/`). Session IDs are recorded in `codex-session.yaml > last_session_id`.
+
+Prior sessions executed tasks 001–016 via Codex CLI (pre-protocol-formalization).
+Session `019d133d-1b84-7773-9926-c26f7c607781` executed tasks 019–025 (plan-003, CLI mode).
