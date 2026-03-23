@@ -86,11 +86,74 @@ After initialization:
 
 ---
 
-## 6. First-time environment setup (for new users)
+## 6. First-time setup (for new users)
 
-Before using this system, configure Claude Code to allow Codex execution.
+### Prerequisites
 
-**Step 1: Edit `~/.claude/settings.json`** (create if it doesn't exist)
+You need three things installed before starting:
+
+| Tool | Check if installed | Install link |
+|---|---|---|
+| Node.js 18+ | `node --version` | https://nodejs.org (download LTS) |
+| Git | `git --version` | https://git-scm.com/downloads |
+| Claude Code | `claude --version` | https://claude.ai/code |
+
+Open a terminal (on Windows: search "Git Bash" or "PowerShell") and run the check commands above. If any show an error, install that tool first.
+
+---
+
+### Step 1: Get this repository
+
+```bash
+# Pick a folder where you want to keep this tool, then run:
+git clone https://github.com/YiNi-X/multi_agent_test.git
+cd multi_agent_test
+```
+
+This downloads the protocol files to your computer. You only need to do this once.
+
+---
+
+### Step 2: Install Codex CLI
+
+```bash
+npm install -g @openai/codex
+```
+
+Verify it worked:
+```bash
+codex --version
+```
+
+You should see a version number like `0.116.0`.
+
+---
+
+### Step 3: Configure your API key
+
+Codex needs an OpenAI API key (or compatible provider key) to run.
+
+**On Windows (Git Bash):**
+```bash
+echo 'export OPENAI_API_KEY="your-key-here"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+**On Mac/Linux:**
+```bash
+echo 'export OPENAI_API_KEY="your-key-here"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+Replace `your-key-here` with your actual API key.
+
+---
+
+### Step 4: Configure Claude Code permissions
+
+Create or edit the file `C:/Users/YourName/.claude/settings.json` (Windows) or `~/.claude/settings.json` (Mac/Linux).
+
+Add these lines (if the file already exists, add only the `permissions` block inside the existing `{}`:
 
 ```json
 {
@@ -103,32 +166,39 @@ Before using this system, configure Claude Code to allow Codex execution.
 }
 ```
 
-**Step 2: Install Codex CLI** (if not already installed)
+---
+
+### Step 5: Initialize the protocol in your project
 
 ```bash
-npm install -g @openai/codex
+# Replace /path/to/your/project with your actual project folder path
+# Example on Windows: /c/Users/YourName/Documents/my-project
+bash /path/to/multi_agent_test/tools/init.sh /path/to/your/project
 ```
 
-Requires Node.js 18+. Verify with `codex --version`.
+This copies all the protocol files into your project and creates a blank `board.yaml` and `SPEC.md`.
 
-**Step 3: Configure Codex**
+---
 
-Codex needs an API key. Add to your shell profile (`~/.bashrc` or `~/.zshrc`):
+### Step 6: Verify everything works
 
 ```bash
-export OPENAI_API_KEY="your-key-here"
+cd /path/to/your/project
+python tools/check_consistency.py
 ```
 
-Or if using a custom provider (like this project), run `codex` once interactively to set up `~/.codex/config.toml`.
+You should see: `0 FAIL, 0 WARN`
 
-**Step 4: Verify**
+---
 
-```bash
-codex --version          # should print version
-python tools/check_consistency.py  # should print 0 FAIL
-```
+### Step 7: Start working
 
-Once both pass, open Claude Code in your project and tell Claude your goal.
+1. Open your project folder in Claude Code
+2. Claude will read `CLAUDE.md` automatically
+3. Tell Claude what you want to build — it handles the rest
+
+**Example first message to Claude:**
+> "I want to build a todo app with React. Please read the board and start planning."
 
 ---
 
