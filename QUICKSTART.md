@@ -86,6 +86,52 @@ After initialization:
 
 ---
 
+## 6. First-time environment setup (for new users)
+
+Before using this system, configure Claude Code to allow Codex execution.
+
+**Step 1: Edit `~/.claude/settings.json`** (create if it doesn't exist)
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "Bash(codex exec:*)",
+      "Bash(python tools/check_consistency.py)"
+    ]
+  }
+}
+```
+
+**Step 2: Install Codex CLI** (if not already installed)
+
+```bash
+npm install -g @openai/codex
+```
+
+Requires Node.js 18+. Verify with `codex --version`.
+
+**Step 3: Configure Codex**
+
+Codex needs an API key. Add to your shell profile (`~/.bashrc` or `~/.zshrc`):
+
+```bash
+export OPENAI_API_KEY="your-key-here"
+```
+
+Or if using a custom provider (like this project), run `codex` once interactively to set up `~/.codex/config.toml`.
+
+**Step 4: Verify**
+
+```bash
+codex --version          # should print version
+python tools/check_consistency.py  # should print 0 FAIL
+```
+
+Once both pass, open Claude Code in your project and tell Claude your goal.
+
+---
+
 ## Workflow order
 
 ```
