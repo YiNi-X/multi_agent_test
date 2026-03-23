@@ -262,7 +262,14 @@ tasks:
     assigned_to: codex
     depends_on: []
     updated: "2026-03-22"
+  - id: "031"
+    slug: "deviation-doc-first-rules"
+    file: "tasks/task-031-deviation-doc-first-rules.md"
+    status: done
+    assigned_to: codex
+    depends_on: []
+    updated: "2026-03-23"
 
 suggested_next_for_codex:
   task_id: ""
-  reason: "plan-004 all tasks done — pending plan-level review and PR"
+  reason: "plan-004 + task-031 all done — ready for plan-level review and PR"

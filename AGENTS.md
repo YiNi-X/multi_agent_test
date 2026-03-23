@@ -29,6 +29,10 @@ Repository-level instructions for agents working in this repo.
 - If Codex is blocked, document the reason, evidence, and suggested next step in
   the task execution log and the report. Do not expand scope, rewrite the plan, or
   silently make a broader change.
+- If you discover that the implementation does not match the task requirements or
+  the spec, record the deviation in the execution log, stop, and explicitly write:
+  "Claude must update SPEC.md before this task is re-issued." Do not attempt to
+  self-correct by expanding scope.
 
 ## Codex CLI execution context
 

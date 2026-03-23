@@ -51,7 +51,7 @@ Codex executes tasks via `codex exec --full-auto` invoked directly by Claude thr
 
 **Session tracking:**
 - After each `codex exec` run, get the session ID from the output header line `session id: <id>`
-- Store in `runtime/codex-session.yaml` under `last_session_id`
+- Store in `runtime/codex-session.yaml` (path is relative to `.ai-collab/`) under `last_session_id`
 - To resume a previous session for dependent tasks:
   ```bash
   cd <project-root> && codex exec --full-auto resume --last "Execute task <ID> in .ai-collab/tasks/task-<ID>-<slug>.md. Read AGENTS.md and .ai-collab/board.yaml first."
@@ -91,6 +91,7 @@ Use the Agent tool with `subagent_type: spec-gardener`. Provide the specific que
 - **When Claude modifies `SPEC.md`:** immediately set `spec_dirty: true` and update `last_spec_change` (YYYY-MM-DD) in `board.yaml > spec_status`. Then evaluate whether any `todo` or `in_progress` tasks are invalidated and update `invalidated_tasks` list.
 - **When `spec_dirty: true` and any task is `in_progress`:** Claude must resolve the conflict before the next Codex invocation. Do not invoke Codex until the conflict is resolved and `spec_dirty` is cleared.
 - **Clearing `spec_dirty`:** After evaluating impact and updating affected tasks (rework to `todo` if needed), set `spec_dirty: false` in `board.yaml`.
+- **When review or testing finds a mismatch between implementation and docs:** update `SPEC.md` first, then write a new task for Codex to fix the code. Never propose a code fix that skips the document update step.
 
 ### PR workflow rules
 
