@@ -6,15 +6,15 @@
 project_id: "test_of_multi_agent"
 
 codex_session:
-  last_session_id: "019d15f2-d7ef-7130-8efb-a8bc9e63b25a"
-  last_task_id: "030"
-  last_used_at: "2026-03-22"
+  last_session_id: "019d1889-dd0b-74d0-9842-c0ecedcde53f"
+  last_task_id: "032"
+  last_used_at: "2026-03-23"
   total_tasks_executed: 0    # total tasks executed via CLI in this project
   session_mode: "cli"        # cli | mcp (always cli after migration)
 
 session_policy:
   resume_for_dependent_tasks: true   # use codex resume for tasks with depends_on
-  new_session_for_independent: true  # use fresh session for independent tasks
+  new_session_for_independent: false # prefer resume --last within same working session
 
 notes: |
   This file tracks Codex CLI session state for project continuity.

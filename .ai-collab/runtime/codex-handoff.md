@@ -1,12 +1,12 @@
 ---
 # machine-readable snapshot - Claude-maintained, updated after every task review
-handoff_version: 4
-snapshot_at: "2026-03-22"
-last_session_id: "019d15f2-d7ef-7130-8efb-a8bc9e63b25a"   # last ~/.codex/session_index.jsonl id
-last_task_id: "030"                           # must match codex-session.yaml
+handoff_version: 5
+snapshot_at: "2026-03-23"
+last_session_id: "019d1889-dd0b-74d0-9842-c0ecedcde53f"   # last ~/.codex/session_index.jsonl id
+last_task_id: "032"                           # must match codex-session.yaml
 plan_id: "plan-004"
 plan_status: "in_progress"
-spec_version: "0.3.0"
+spec_version: "0.4.0"
 spec_dirty: false
 suggested_next_task_id: ""                           # "" = no pending tasks
 open_questions_count: 0                              # 0 = all resolved or deferred
@@ -14,7 +14,7 @@ open_questions_count: 0                              # 0 = all resolved or defer
 
 # Codex Handoff Summary
 
-**Last updated:** 2026-03-22
+**Last updated:** 2026-03-23
 
 ---
 
@@ -22,11 +22,11 @@ open_questions_count: 0                              # 0 = all resolved or defer
 
 | Field | Value |
 |---|---|
-| Last session ID | `019d133d-1b84-7773-9926-c26f7c607781` |
+| Last session ID | `019d1889-dd0b-74d0-9842-c0ecedcde53f` |
 | Session mode | `CLI` |
-| Last task executed | `task-025` (migrate-to-codex-cli) |
-| Tasks executed this session | 019 (Claude direct), 020, 021, 022, 023, 024, 025 |
-| Files modified this session | CLAUDE.md, AGENTS.md, codex-worker-protocol.md, QUICKSTART.md, tools/check_consistency.py, runtime/codex-session.yaml, SPEC.md, templates/plan-template.md, templates/review-template.md, templates/milestone-template.md |
+| Last task executed | `task-032` (resume-session-policy) |
+| Tasks executed this session | 026, 027, 028, 029, 030, 031, 032 |
+| Files modified this session | CLAUDE.md, AGENTS.md, tools/init.sh, tools/check_consistency.py, QUICKSTART.md, .ai-collab/spec/SPEC.md, .ai-collab/templates/plan-template.md, .ai-collab/templates/review-template.md, .ai-collab/templates/milestone-template.md |
 
 ---
 

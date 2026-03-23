@@ -269,7 +269,14 @@ tasks:
     assigned_to: codex
     depends_on: []
     updated: "2026-03-23"
+  - id: "032"
+    slug: "resume-session-policy"
+    file: "tasks/task-032-resume-session-policy.md"
+    status: done
+    assigned_to: codex
+    depends_on: []
+    updated: "2026-03-23"
 
 suggested_next_for_codex:
   task_id: ""
-  reason: "plan-004 + task-031 all done — ready for plan-level review and PR"
+  reason: "task-032 done — all protocol improvements complete, ready for PR"

@@ -52,11 +52,19 @@ Codex executes tasks via `codex exec --full-auto` invoked directly by Claude thr
 **Session tracking:**
 - After each `codex exec` run, get the session ID from the output header line `session id: <id>`
 - Store in `runtime/codex-session.yaml` (path is relative to `.ai-collab/`) under `last_session_id`
-- To resume a previous session for dependent tasks:
+- **Default: prefer `resume --last` within the same working session** - use `codex exec --full-auto resume --last "..."` for all tasks unless one of the exceptions below applies
+- Only start a **fresh session** when:
+  1. `last_session_id` is empty (first task ever)
+  2. Explicitly starting a new plan after a gap of days
+  3. The previous session is confirmed expired (resume returns session-not-found error)
+- To resume:
   ```bash
-  cd <project-root> && codex exec --full-auto resume --last "Execute task <ID> in .ai-collab/tasks/task-<ID>-<slug>.md. Read AGENTS.md and .ai-collab/board.yaml first."
+  cd <project-root> && codex exec --full-auto resume --last "Execute task <ID> in .ai-collab/tasks/task-<ID>-<slug>.md. Read AGENTS.md and .ai-collab/board.yaml first. Do not modify board.yaml or runtime/codex-session.yaml."
   ```
-- Local sessions do not expire - `~/.codex/sessions/` persists indefinitely
+- To start fresh:
+  ```bash
+  cd <project-root> && codex exec --full-auto "Execute task <ID> in .ai-collab/tasks/task-<ID>-<slug>.md. Read AGENTS.md and .ai-collab/board.yaml first. Do not modify board.yaml or runtime/codex-session.yaml."
+  ```
 
 **Full protocol details:** `.ai-collab/templates/codex-worker-protocol.md`
 
